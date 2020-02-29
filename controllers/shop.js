@@ -8,7 +8,8 @@ exports.getHomePage = (req, res, next) => {
     //console.log(adminData.data);
     res.render('homePage/shop.ejs', {
         pageTitle: 'Home',
-        path: 'homePage/shop.ejs'
+        path: 'homePage/shop.ejs',
+        isAuthenticated: req.isLoggedIn,
     });
 }
 
@@ -21,7 +22,8 @@ exports.getProductsPage = (req, res, next) => {
             res.render('shop/product-list', {
                 datas: products,
                 pageTitle: 'Product-List',
-                path: 'users/products'
+                path: 'users/products',
+                isAuthenticated: req.isLoggedIn
             })
         )
         .catch(err => console.log(err));
@@ -37,7 +39,8 @@ exports.getProductDetails = (req, res, next) => {
             res.render('shop/product-details', {
                 data: product,
                 pageTitle: 'Details',
-                path: 'users/products'
+                path: 'users/products',
+                isAuthenticated: req.isLoggedIn
             })
         })
         .catch(err => console.log(err));
@@ -65,7 +68,8 @@ exports.getCart = (req, res, next) => {
             res.render('shop/cart', {
                 path: 'user/cart',
                 pageTitle: 'Cart',
-                productItem: user.cart.items
+                productItem: user.cart.items,
+                isAuthenticated: req.isLoggedIn
             })
         })
 }
@@ -123,7 +127,8 @@ exports.getOrder = (req, res, next) => {
             res.render('shop/order', {
                 path: 'user/order',
                 pageTitle: 'Your Orders',
-                orders: orders
+                orders: orders,
+                isAuthenticated: req.isLoggedIn
             })
         })
         .catch(err => console.log(err));

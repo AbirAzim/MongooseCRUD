@@ -1,0 +1,23 @@
+<%- include('../includes/head.ejs') %>
+
+<body>
+    <%- include('../includes/nav.ejs') %>
+
+    <div class="container">
+        <div class="row">
+
+            <form action="/login" method="POST" class="">
+                <div class="form-group">
+                    <label for="email" class="text-success">Gmail</label>
+                    <input type="email" class="form-control" id="gmail" placeholder="Enter Gmail" name="gmail">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="text-success">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter Password"
+                        name="password">
+                    <button type="submit" class="btn btn-primary mt-2">Login</button>
+            </form>
+        </div>
+
+    </div>
+    <%- include('../includes/end.ejs') %>

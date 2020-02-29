@@ -10,35 +10,39 @@
             <li class="nav-item<%= path === 'homePage/shop.ejs' ? ' active': ' ' %>">
                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
+            <% if(isAuthenticated) { %>
             <li class="nav-item<%= path === 'admin/add-product.ejs' ? ' active': ' ' %>">
                 <a class="nav-link" href="/admin/add-product">Add Product</a>
             </li>
             <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-            </li> -->
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li> -->
             <li class="nav-item<%= path === 'admin/product-list.ejs' ? ' active': ' ' %>">
                 <a class="nav-link" href="/admin/products">Product List</a>
             </li>
+            <% } %>
             <li class="nav-item<%= path === 'users/products' ? ' active': ' ' %>">
                 <a class="nav-link" href="/users/products">Products</a>
             </li>
             <li class="nav-item<%= path === 'user/cart' ? ' active': ' ' %>">
                 <a class="nav-link" href="/cart">Cart</a>
             </li>
-            <li class="nav-item<%= path === 'user/order' ? ' active': ' ' %>">
+            <li class="nav-item<%= path === 'user/order' ? ' active': ' ' %> mr-5">
                 <a class="nav-link" href="/order">Order</a>
             </li>
-
         </ul>
+        <span class="nav-item<%= path === 'user/login' ? ' active': ' ' %>">
+            <a class="nav-link text-info font-weight-bold" href="/login">Login</a>
+        </span>
         <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>

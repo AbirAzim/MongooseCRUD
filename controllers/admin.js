@@ -7,7 +7,8 @@ exports.getAddProduct = (req, res, next) => {
         path: 'admin/add-product.ejs',
         activeAddProduct: true,
         productCSS: true,
-        editig: false
+        editig: false,
+        isAuthenticated: req.isLoggedIn
     });
 }
 
@@ -34,7 +35,8 @@ exports.postAddProduct = (req, res, next) => {
                     res.render('admin/products.ejs', {
                         datas: products,
                         pageTitle: 'Product-List',
-                        path: 'admin/product-list.ejs'
+                        path: 'admin/product-list.ejs',
+                        isAuthenticated: req.isLoggedIn
                     })
                 })
                 .catch(err => console.log(err));
@@ -51,7 +53,8 @@ exports.getProductList = (req, res, next) => {
             res.render('admin/products.ejs', {
                 datas: products,
                 pageTitle: 'Product-List',
-                path: 'admin/product-list.ejs'
+                path: 'admin/product-list.ejs',
+                isAuthenticated: req.isLoggedIn
             })
         }).catch(err => console.log(err));
 }
@@ -63,7 +66,8 @@ exports.getEditProduct = (req, res, next) => {
             res.render('admin/edit-product.ejs', {
                 pageTitle: 'Edit Product',
                 path: 'admin/edit-product',
-                productForEdit: product
+                productForEdit: product,
+                isAuthenticated: req.isLoggedIn
             });
         })
         .catch(err => console.log(err));
@@ -97,7 +101,8 @@ exports.postEditData = (req, res, next) => {
                     res.render('admin/products.ejs', {
                         datas: products,
                         pageTitle: 'Product-List',
-                        path: 'admin/product-list.ejs'
+                        path: 'admin/product-list.ejs',
+                        isAuthenticated: req.isLoggedIn
                     })
                 })
                 .catch(err => console.log(err));
@@ -116,7 +121,8 @@ exports.deleteData = (req, res, next) => {
                     res.render('admin/products.ejs', {
                         datas: products,
                         pageTitle: 'Product-List',
-                        path: 'admin/product-list.ejs'
+                        path: 'admin/product-list.ejs',
+                        isAuthenticated: req.isLoggedIn
                     })
                 })
                 .catch(err => console.log(err));
