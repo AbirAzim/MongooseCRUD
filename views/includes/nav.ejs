@@ -33,16 +33,28 @@
             <li class="nav-item<%= path === 'users/products' ? ' active': ' ' %>">
                 <a class="nav-link" href="/users/products">Products</a>
             </li>
+            <% if(isAuthenticated) { %>
             <li class="nav-item<%= path === 'user/cart' ? ' active': ' ' %>">
                 <a class="nav-link" href="/cart">Cart</a>
             </li>
             <li class="nav-item<%= path === 'user/order' ? ' active': ' ' %> mr-5">
                 <a class="nav-link" href="/order">Order</a>
             </li>
+            <% } %>
         </ul>
+        <% if(!isAuthenticated) { %>
         <span class="nav-item<%= path === 'user/login' ? ' active': ' ' %>">
             <a class="nav-link text-info font-weight-bold" href="/login">Login</a>
         </span>
+        <% } %>
+        <!-- <span class="nav-item<%= path === 'user/logout' ? ' active': ' ' %>">
+            <a class="nav-link text-danger font-weight-bold" href="/logout">Logout</a>
+        </span> -->
+        <% if(isAuthenticated) { %>
+        <form action="/logout" method="POST" class="mx-2">
+            <button class="btn btn-danger" type="submit">Logout</button>
+        </form>
+        <% } %>
         <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>

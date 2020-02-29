@@ -46,9 +46,13 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    User.findById('5e57981f78d16f545c71a2e3')
+    if (!req.session.user) {
+        return next();
+    }
+    User.findById(req.session.user._id)
         .then(user => {
             req.user = user;
+            req.session.isLoggedIn = true; // this is added throughmiddlewire 
             next();
         })
         .catch(err => console.log(err));

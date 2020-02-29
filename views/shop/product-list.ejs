@@ -23,12 +23,14 @@
                                 <div class="col-sm-4">
                                     <a href="/product-details/<%= datas[i]._id %>" class="btn btn-primary">Details</a>
                                 </div>
+                                <% if(isAuthenticated) { %>
                                 <div class="col-sm-4">
                                     <form action="/cart" method="POST">
                                         <button type="submit" href="/cart" class="btn btn-primary">Add to Cart</button>
                                         <input type="hidden" name="productId" value="<%= datas[i]._id %>">
                                     </form>
                                 </div>
+                                <% } %>
                                 <div class="col-sm-4">
                                 </div>
                             </div>

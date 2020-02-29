@@ -6,10 +6,11 @@ const User = require('../models/user');
 
 exports.getHomePage = (req, res, next) => {
     //console.log(adminData.data);
+
     res.render('homePage/shop.ejs', {
         pageTitle: 'Home',
         path: 'homePage/shop.ejs',
-        isAuthenticated: req.isLoggedIn,
+        isAuthenticated: req.session.isLoggedIn,
     });
 }
 
@@ -23,7 +24,7 @@ exports.getProductsPage = (req, res, next) => {
                 datas: products,
                 pageTitle: 'Product-List',
                 path: 'users/products',
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             })
         )
         .catch(err => console.log(err));
@@ -40,7 +41,7 @@ exports.getProductDetails = (req, res, next) => {
                 data: product,
                 pageTitle: 'Details',
                 path: 'users/products',
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             })
         })
         .catch(err => console.log(err));
@@ -65,11 +66,12 @@ exports.getCart = (req, res, next) => {
         .populate('cart.items.productId')
         .execPopulate()
         .then(user => {
+            console.log(user.cart.items);
             res.render('shop/cart', {
                 path: 'user/cart',
                 pageTitle: 'Cart',
                 productItem: user.cart.items,
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             })
         })
 }
@@ -128,7 +130,7 @@ exports.getOrder = (req, res, next) => {
                 path: 'user/order',
                 pageTitle: 'Your Orders',
                 orders: orders,
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             })
         })
         .catch(err => console.log(err));

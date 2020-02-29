@@ -8,7 +8,7 @@ exports.getAddProduct = (req, res, next) => {
         activeAddProduct: true,
         productCSS: true,
         editig: false,
-        isAuthenticated: req.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn
     });
 }
 
@@ -36,7 +36,7 @@ exports.postAddProduct = (req, res, next) => {
                         datas: products,
                         pageTitle: 'Product-List',
                         path: 'admin/product-list.ejs',
-                        isAuthenticated: req.isLoggedIn
+                        isAuthenticated: req.session.isLoggedIn
                     })
                 })
                 .catch(err => console.log(err));
@@ -54,7 +54,7 @@ exports.getProductList = (req, res, next) => {
                 datas: products,
                 pageTitle: 'Product-List',
                 path: 'admin/product-list.ejs',
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             })
         }).catch(err => console.log(err));
 }
@@ -67,7 +67,7 @@ exports.getEditProduct = (req, res, next) => {
                 pageTitle: 'Edit Product',
                 path: 'admin/edit-product',
                 productForEdit: product,
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             });
         })
         .catch(err => console.log(err));
@@ -102,7 +102,7 @@ exports.postEditData = (req, res, next) => {
                         datas: products,
                         pageTitle: 'Product-List',
                         path: 'admin/product-list.ejs',
-                        isAuthenticated: req.isLoggedIn
+                        isAuthenticated: req.session.isLoggedIn
                     })
                 })
                 .catch(err => console.log(err));
@@ -122,7 +122,7 @@ exports.deleteData = (req, res, next) => {
                         datas: products,
                         pageTitle: 'Product-List',
                         path: 'admin/product-list.ejs',
-                        isAuthenticated: req.isLoggedIn
+                        isAuthenticated: req.session.isLoggedIn
                     })
                 })
                 .catch(err => console.log(err));
