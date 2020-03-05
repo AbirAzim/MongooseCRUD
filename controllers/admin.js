@@ -90,7 +90,7 @@ exports.postEditData = (req, res, next) => {
             product.productName = updatedProductName;
             product.productPrice = updatedProductPrice;
             product.imageUrl = updatedImageUrl;
-            product.desc = updatedDesc;
+            product.description = updatedDesc;
             product.userId = userId;
 
             return product.save();

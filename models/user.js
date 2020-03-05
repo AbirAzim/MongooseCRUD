@@ -11,6 +11,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    password: {
+        type: String,
+        required: true
+    },
     cart: {
         items: [{
             productId: {
@@ -27,7 +31,7 @@ const userSchema = new Schema({
     }
 })
 
-userSchema.methods.addToCart = function (product) {
+userSchema.methods.addToCart = function(product) {
 
     const cartProductIndex = this.cart.items.findIndex(cartItem => cartItem.productId.toString() === product._id.toString());
     let newQuantity = 1; // the product we wanna enter into cart first of all check the product id is present in the cart items or not
@@ -42,10 +46,10 @@ userSchema.methods.addToCart = function (product) {
         //console.log(updatedCartItems);
     } else {
         updatedCartItems.push({
-            productId: product._id,
-            quantity: newQuantity
-        })
-        //console.log(updatedCartItems);
+                productId: product._id,
+                quantity: newQuantity
+            })
+            //console.log(updatedCartItems);
     }
 
     const updatedCart = {
@@ -59,13 +63,13 @@ userSchema.methods.addToCart = function (product) {
     return this.save();
 }
 
-userSchema.methods.deleteItemFromCart = function (productId) {
+userSchema.methods.deleteItemFromCart = function(productId) {
     const updatedCartItems = this.cart.items.filter(ci => ci._id.toString() !== productId.toString());
     this.cart.items = updatedCartItems;
     return this.save();
 }
 
-userSchema.methods.clearCart = function () {
+userSchema.methods.clearCart = function() {
     this.cart = {
         items: []
     };
