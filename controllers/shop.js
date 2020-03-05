@@ -10,7 +10,7 @@ exports.getHomePage = (req, res, next) => {
     res.render('homePage/shop.ejs', {
         pageTitle: 'Home',
         path: 'homePage/shop.ejs',
-        isAuthenticated: req.session.isLoggedIn,
+        isAuthenticated: req.session.isLoggedIn
     });
 }
 

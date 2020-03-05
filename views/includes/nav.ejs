@@ -1,7 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-2">
     <a class="navbar-brand text-success" href="#">DIU Project Hub</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -11,10 +10,10 @@
                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
             <% if(isAuthenticated) { %>
-            <li class="nav-item<%= path === 'admin/add-product.ejs' ? ' active': ' ' %>">
-                <a class="nav-link" href="/admin/add-product">Add Product</a>
-            </li>
-            <!-- <li class="nav-item dropdown">
+                <li class="nav-item<%= path === 'admin/add-product.ejs' ? ' active': ' ' %>">
+                    <a class="nav-link" href="/admin/add-product">Add Product</a>
+                </li>
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Dropdown
@@ -26,41 +25,43 @@
                         <a class="dropdown-item" href="#">Something else here</a>
                     </div>
                 </li> -->
-            <li class="nav-item<%= path === 'admin/product-list.ejs' ? ' active': ' ' %>">
-                <a class="nav-link" href="/admin/products">Product List</a>
-            </li>
-            <% } %>
-            <li class="nav-item<%= path === 'users/products' ? ' active': ' ' %>">
-                <a class="nav-link" href="/users/products">Products</a>
-            </li>
-            <% if(isAuthenticated) { %>
-            <li class="nav-item<%= path === 'user/cart' ? ' active': ' ' %>">
-                <a class="nav-link" href="/cart">Cart</a>
-            </li>
-            <li class="nav-item<%= path === 'user/order' ? ' active': ' ' %> mr-5">
-                <a class="nav-link" href="/order">Order</a>
-            </li>
-            <% } %>
+                <li class="nav-item<%= path === 'admin/product-list.ejs' ? ' active': ' ' %>">
+                    <a class="nav-link" href="/admin/products">Product List</a>
+                </li>
+                <% } %>
+                    <li class="nav-item<%= path === 'users/products' ? ' active': ' ' %>">
+                        <a class="nav-link" href="/users/products">Products</a>
+                    </li>
+                    <% if(isAuthenticated) { %>
+                        <li class="nav-item<%= path === 'user/cart' ? ' active': ' ' %>">
+                            <a class="nav-link" href="/cart">Cart</a>
+                        </li>
+                        <li class="nav-item<%= path === 'user/order' ? ' active': ' ' %> mr-5">
+                            <a class="nav-link" href="/order">Order</a>
+                        </li>
+                        <% } %>
         </ul>
         <% if(!isAuthenticated) { %>
-        <span class="nav-item<%= path === 'user/login' ? ' active': ' ' %>">
+            <span class="nav-item<%= path === 'user/login' ? ' active': ' ' %>">
             <a class="nav-link text-info font-weight-bold" href="/login">Login</a>
         </span>
-        <span class="nav-item<%= path === 'user/sign-up' ? ' active': ' ' %>">
+            <span class="nav-item<%= path === 'user/sign-up' ? ' active': ' ' %>">
             <a class="nav-link text-info font-weight-bold" href="/sign-up">Sign-up</a>
-        </span>       
-        <% } %>
-        <!-- <span class="nav-item<%= path === 'user/logout' ? ' active': ' ' %>">
+        </span>
+            <% } %>
+                <!-- <span class="nav-item<%= path === 'user/logout' ? ' active': ' ' %>">
             <a class="nav-link text-danger font-weight-bold" href="/logout">Logout</a>
         </span> -->
-        <% if(isAuthenticated) { %>
-        <form action="/logout" method="POST" class="mx-2">
-            <button class="btn btn-danger" type="submit">Logout</button>
-        </form>
-        <% } %>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+                <% if(isAuthenticated) { %>
+                    <form action="/logout" method="POST" class="mx-2">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="btn btn-danger" type="submit">Logout</button>
+                    </form>
+                    <% } %>
+                        <form class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>
     </div>
 </nav>

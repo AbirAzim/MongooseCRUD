@@ -8,6 +8,7 @@ const authRoute = require('./routes/auth'); //importing route auth.js file
 const errorPage = require('./controllers/error');
 const session = require('express-session');
 const MogodbSessionStore = require('connect-mongodb-session')(session);
+const csrfToken = require('csurf');
 
 
 const User = require('./models/user');
@@ -21,6 +22,8 @@ const store = new MogodbSessionStore({
     uri: MONGODB_URI,
     collection: 'sessions'
 });
+
+const csrfProtection = csrfToken();
 
 
 app.set('view engine', 'ejs'); // to set ejs as view engine
@@ -45,6 +48,8 @@ app.use(session({
     store: store
 }));
 
+app.use(csrfProtection);
+
 app.use((req, res, next) => {
     if (!req.session.user) {
         return next();
@@ -56,6 +61,12 @@ app.use((req, res, next) => {
             next();
         })
         .catch(err => console.log(err));
+})
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
 })
 
 app.use('/admin', router);

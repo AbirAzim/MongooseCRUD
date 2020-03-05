@@ -1,31 +1,37 @@
 <%- include('../includes/head.ejs') %>
 
-<body>
-    <%- include('../includes/nav.ejs') %>
-    <div class="container mt-4">
-        <% if(datas.length === 0) {%>
-        <h1 class="display-3 text-center">No Inputs </h1>
-        <% } else {%>
-        <div class="row">
-            <% for(let i = 0 ; i < datas.length ; i ++){ %>
-            <div class="col-sm-4">
-                <div class="card" style="width: 25rem; height: 50rem;">
-                    <img class=" card-img-top img-fluid" src="<%= datas[i].imageUrl %>" alt="Card image cap"
-                        style="width: 20rem; height: 16rem;">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= datas[i].productName %></h5>
-                        <h4 class="card-subtitle mb-2 text-danger"><%= datas[i].productPrice %></h4>
-                        <p class="card-text"><%= datas[i].description %></p>
-                        <% if(isAuthenticated) { %>
-                        <a href="/admin/delete-product/<%= datas[i]._id %>" class="btn btn-success">Delete</a>
-                        <a href="/admin/edit-products/<%= datas[i]._id %>" class="btn btn-danger">Edit</a>
-                        <% } %>
-                    </div>
-                </div>
+    <body>
+        <%- include('../includes/nav.ejs') %>
+            <div class="container mt-4">
+                <% if(datas.length === 0) {%>
+                    <h1 class="display-3 text-center">No Inputs </h1>
+                    <% } else {%>
+                        <div class="row">
+                            <% for(let i = 0 ; i < datas.length ; i ++){ %>
+                                <div class="col-sm-4">
+                                    <div class="card" style="width: 25rem; height: 50rem;">
+                                        <img class=" card-img-top img-fluid" src="<%= datas[i].imageUrl %>" alt="Card image cap" style="width: 20rem; height: 16rem;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <%= datas[i].productName %>
+                                            </h5>
+                                            <h4 class="card-subtitle mb-2 text-danger">
+                                                <%= datas[i].productPrice %>
+                                            </h4>
+                                            <p class="card-text">
+                                                <%= datas[i].description %>
+                                            </p>
+                                            <% if(isAuthenticated) { %>
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <a href="/admin/delete-product/<%= datas[i]._id %>" class="btn btn-success">Delete</a>
+                                                <a href="/admin/edit-products/<%= datas[i]._id %>" class="btn btn-danger">Edit</a>
+                                                <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }} %>
+                        </div>
+
             </div>
-            <% }} %>
-        </div>
 
-    </div>
-
-    <%- include('../includes/end.ejs') %>
+            <%- include('../includes/end.ejs') %>

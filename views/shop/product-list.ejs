@@ -1,45 +1,49 @@
 <%- include('../includes/head.ejs') %>
 
-<body>
-    <%- include('../includes/nav.ejs') %>
-    <div class="container mt-2">
-        <% if(datas.length === 0) {%>
-        <h1 class="display-3 text-center">No Inputs </h1>
-        <% } else {%>
-        <div class="row  mt-2">
-            <% for(let i = 0 ; i < datas.length ; i ++){ if(datas.length % 2 === 1){%>
-            <div class="col-sm-4">
-                <% }else{ %>
-                <div class="col-sm-4">
-                    <% } %>
-                    <div class="card" style="width: 25rem; height: 50rem;">
-                        <img class=" card-img-top img-fluid" src="<%= datas[i].imageUrl %>" alt="Card image cap"
-                            style="width: 20rem; height: 16rem;">
-                        <div class="card-body">
-                            <h5 class="card-title"><%= datas[i].productName %></h5>
-                            <h4 class="card-subtitle mb-2 text-danger"><%= datas[i].productPrice %></h4>
-                            <p class="card-text p-1"><%= datas[i].description %></p>
-                            <div class="row">
+    <body>
+        <%- include('../includes/nav.ejs') %>
+            <div class="container mt-2">
+                <% if(datas.length === 0) {%>
+                    <h1 class="display-3 text-center">No Inputs </h1>
+                    <% } else {%>
+                        <div class="row  mt-2">
+                            <% for(let i = 0 ; i < datas.length ; i ++){ if(datas.length % 2 === 1){%>
                                 <div class="col-sm-4">
-                                    <a href="/product-details/<%= datas[i]._id %>" class="btn btn-primary">Details</a>
+                                    <% }else{ %>
+                                        <div class="col-sm-4">
+                                            <% } %>
+                                                <div class="card" style="width: 25rem; height: 50rem;">
+                                                    <img class=" card-img-top img-fluid" src="<%= datas[i].imageUrl %>" alt="Card image cap" style="width: 20rem; height: 16rem;">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">
+                                                            <%= datas[i].productName %>
+                                                        </h5>
+                                                        <h4 class="card-subtitle mb-2 text-danger">
+                                                            <%= datas[i].productPrice %>
+                                                        </h4>
+                                                        <p class="card-text p-1">
+                                                            <%= datas[i].description %>
+                                                        </p>
+                                                        <div class="row">
+                                                            <div class="col-sm-4">
+                                                                <a href="/product-details/<%= datas[i]._id %>" class="btn btn-primary">Details</a>
+                                                            </div>
+                                                            <% if(isAuthenticated) { %>
+                                                                <div class="col-sm-4">
+                                                                    <form action="/cart" method="POST">
+                                                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                                        <button type="submit" href="/cart" class="btn btn-primary">Add to Cart</button>
+                                                                        <input type="hidden" name="productId" value="<%= datas[i]._id %>">
+                                                                    </form>
+                                                                </div>
+                                                                <% } %>
+                                                                    <div class="col-sm-4">
+                                                                    </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <% }} %>
                                 </div>
-                                <% if(isAuthenticated) { %>
-                                <div class="col-sm-4">
-                                    <form action="/cart" method="POST">
-                                        <button type="submit" href="/cart" class="btn btn-primary">Add to Cart</button>
-                                        <input type="hidden" name="productId" value="<%= datas[i]._id %>">
-                                    </form>
-                                </div>
-                                <% } %>
-                                <div class="col-sm-4">
-                                </div>
-                            </div>
                         </div>
-                    </div>
-                </div>
-                <% }} %>
-            </div>
-
-        </div>
-
-        <%- include('../includes/end.ejs') %>
+                        <%- include('../includes/end.ejs') %>

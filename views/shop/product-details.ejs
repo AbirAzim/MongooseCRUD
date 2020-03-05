@@ -1,32 +1,38 @@
 <%- include('../includes/head.ejs') %>
 
-<body>
-    <%- include('../includes/nav.ejs') %>
-    <div class="container mt-2">
-        <div class="row">
-            <div class="col-sm-4">
+    <body>
+        <%- include('../includes/nav.ejs') %>
+            <div class="container mt-2">
+                <div class="row">
+                    <div class="col-sm-4">
 
-            </div>
-            <col-sm-4>
-                <div class="card text-center" style="width: 25rem; height: 50rem;">
-                    <img class=" card-img-top img-fluid" src="<%= data.imageUrl %>" alt="Card image cap"
-                        style="width: 20rem; height: 16rem;">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= data.productName %></h5>
-                        <h4 class="card-subtitle mb-2 text-danger"><%= data.productPrice %></h4>
-                        <p class="card-text p-1"><%= data.description %></p>
-                        <form action="/cart" method="POST">
-                            <button type="submit" href="/cart" class="btn btn-primary">Add to Cart</button>
-                            <input type="hidden" name="productId" value="<%= data._id %>">
-                        </form>
+                    </div>
+                    <col-sm-4>
+                        <div class="card text-center" style="width: 25rem; height: 50rem;">
+                            <img class=" card-img-top img-fluid" src="<%= data.imageUrl %>" alt="Card image cap" style="width: 20rem; height: 16rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <%= data.productName %>
+                                </h5>
+                                <h4 class="card-subtitle mb-2 text-danger">
+                                    <%= data.productPrice %>
+                                </h4>
+                                <p class="card-text p-1">
+                                    <%= data.description %>
+                                </p>
+                                <form action="/cart" method="POST">
+                                    <button type="submit" href="/cart" class="btn btn-primary">Add to Cart</button>
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <input type="hidden" name="productId" value="<%= data._id %>">
+                                </form>
+                            </div>
+                        </div>
+                    </col-sm-4>
+                    <div class="col-sm-4">
+
                     </div>
                 </div>
-            </col-sm-4>
-            <div class="col-sm-4">
-
-            </div>
-        </div>
 
 
 
-        <%- include('../includes/end.ejs') %>
+                <%- include('../includes/end.ejs') %>
