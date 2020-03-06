@@ -9,6 +9,7 @@ const errorPage = require('./controllers/error');
 const session = require('express-session');
 const MogodbSessionStore = require('connect-mongodb-session')(session);
 const csrfToken = require('csurf');
+const flash = require('connect-flash'); // for invalid something to show to the user
 
 
 const User = require('./models/user');
@@ -50,6 +51,8 @@ app.use(session({
 
 app.use(csrfProtection);
 
+app.use(flash());
+
 app.use((req, res, next) => {
     if (!req.session.user) {
         return next();
@@ -65,8 +68,8 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
-    next();
+    res.locals.csrfToken = req.csrfToken(); // only available in views 
+    next(); // without next the program will stack here 
 })
 
 app.use('/admin', router);

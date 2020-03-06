@@ -8,7 +8,9 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login.ejs', {
         path: 'user/login',
         pageTitle: 'Log-in',
-        isAuthenticated: false
+        isAuthenticated: false,
+        invalidEmail: req.flash('error'),
+        invalidPassword: req.flash('errorPass')
     })
 }
 
@@ -21,6 +23,7 @@ exports.postLogin = (req, res, next) => {
     User.findOne({ gmail: gmail })
         .then(user => {
             if (!user) {
+                req.flash('error', 'Invalid Email');
                 res.redirect('/login');
             } else {
                 bcrypt.compare(password, user.password)
@@ -33,9 +36,13 @@ exports.postLogin = (req, res, next) => {
                                     res.redirect('/login');
                                 } else res.redirect('/');
                             });
-                        } else res.redirect('/login');
+                        } else {
+                            req.flash('errorPass', 'Invalid Password');
+                            res.redirect('/login');
+                        }
                     })
                     .catch(err => {
+                        req.flash('errorPass', 'Invalid Password');
                         res.redirect('/login');
                     });
             }
@@ -58,7 +65,8 @@ exports.getSignup = (req, res, next) => {
     res.render('auth/signup.ejs', {
         path: 'user/sign-up',
         pageTitle: 'Sign-up',
-        isAuthenticated: false
+        isAuthenticated: false,
+        alreadyHaveThisEmailError: req.flash('errorAccount')
     })
 }
 
@@ -72,7 +80,8 @@ exports.postSignup = (req, res, next) => {
     User.findOne({ gmail: gmail })
         .then(user => {
             if (user) {
-                return res.redirect('/login');
+                req.flash('errorAccount', 'Already Have Account With That Email');
+                return res.redirect('/sign-up');
             }
             return bcrypt.hash(password, 12)
                 .then(hashPass => {
