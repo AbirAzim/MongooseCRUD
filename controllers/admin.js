@@ -8,7 +8,8 @@ exports.getAddProduct = (req, res, next) => {
         activeAddProduct: true,
         productCSS: true,
         editig: false,
-        isAuthenticated: req.session.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn,
+        userId: req.user._id.toString()
     });
 }
 
@@ -30,7 +31,7 @@ exports.postAddProduct = (req, res, next) => {
 
     product.save() //save method comming from mongoose
         .then(result => {
-            Product.find()
+            Product.find({ userId: req.body.userId }) //
                 .then(products => {
                     res.render('admin/products.ejs', {
                         datas: products,
@@ -44,8 +45,8 @@ exports.postAddProduct = (req, res, next) => {
         .catch(err => console.log(err));
 }
 
-exports.getProductList = (req, res, next) => {
-    Product.find() // find() is a mongoose method to retrive all the data from a certain model or schema
+exports.getProductList = (req, res, next) => { //{ userId: req.user._id }
+    Product.find({ userId: req.user._id }) // find() is a mongoose method to retrive all the data from a certain model or schema
         // .select('productName productPrice -_id')
         // .populate('userId', 'name')
         .then(products => {
@@ -76,6 +77,7 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditData = (req, res, next) => {
 
+
     const updatedProductName = req.body.productName;
     const updatedProductPrice = req.body.productPrice;
     const updatedImageUrl = req.body.imageUrl;
@@ -86,17 +88,21 @@ exports.postEditData = (req, res, next) => {
 
     Product.findById(prodId)
         .then(product => {
-
+            if (product.userId.toString() !== req.user._id.toString()) {
+                console.log('not edited :' + product);
+                return product.save();
+            }
             product.productName = updatedProductName;
             product.productPrice = updatedProductPrice;
             product.imageUrl = updatedImageUrl;
             product.description = updatedDesc;
             product.userId = userId;
 
+            console.log('edited :' + product);
             return product.save();
         })
         .then(result => {
-            Product.find()
+            Product.find({ userId: req.user._id })
                 .then(products => {
                     res.render('admin/products.ejs', {
                         datas: products,
@@ -114,9 +120,11 @@ exports.postEditData = (req, res, next) => {
 
 exports.deleteData = (req, res, next) => {
 
-    Product.findByIdAndRemove(req.params.productId)
+    prodId = req.params.productId;
+    //Product.findByIdAndRemove(req.params.productId)
+    Product.deleteOne({ _id: prodId, userId: req.user._id })
         .then(() => {
-            Product.find()
+            Product.find({ userId: req.user._id })
                 .then(products => {
                     res.render('admin/products.ejs', {
                         datas: products,
