@@ -19,6 +19,7 @@
                                 <input type="password" class="form-control" id="password" placeholder="Enter Password" name="password">
                                 <% if(invalidPassword.length > 0) { %>
                                     <span class="text-danger my-2 mx-1"><%= invalidPassword %></span>
+                                    <a class="btn btn-success" href="/reset">Reset Password</a>
                                     <% } %>
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <div class="mt-4">

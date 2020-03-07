@@ -1,5 +1,21 @@
+const crypto = require('crypto'); //using built in crypto libraary for genaration random token for user
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const randomString = require('randomstring');
+const nodemailer = require('nodemailer');
+const nodemailerMailgunTransport = require('nodemailer-mailgun-transport');
+
+
+//step 1
+const auth = {
+    auth: {
+        api_key: '889d8014d093da1cc7eb96beece1ef0f-c322068c-da37f278',
+        domain: 'sandboxd01d44a727b7430f978fb845b877f9a4.mailgun.org'
+    }
+}
+
+//step 2
+let transporter = nodemailer.createTransport(nodemailerMailgunTransport(auth));
 
 exports.getLogin = (req, res, next) => {
 
@@ -91,12 +107,137 @@ exports.postSignup = (req, res, next) => {
                         password: hashPass,
                         cart: { items: [] }
                     })
+                    const mailOptions = { //sending mail creating mailoption
+                        from: 'badhonkhanbk007@gmail.com',
+                        to: gmail, //enters useer gmailid
+                        subject: 'new',
+                        html: `<h1>Successfully Registered to Diu Project Hub</h1>  <b>Thanks You !</b>`
+                    }
+                    let token = randomString.generate();
+                    user.token = token;
+                    //flag the account as inactive
+                    user.active = false;
                     user.save()
                         .then(result => {
                             res.redirect('/login');
+                            transporter.sendMail(mailOptions, (err, data) => {
+                                if (err) {
+                                    console.log(err)
+                                } else {
+                                    console.log('message sent');
+                                }
+                            })
                         })
                         .catch(err => console.log(err));
                 })
         })
         .catch(err => console.log(err));
+}
+
+
+exports.getReset = (req, res, next) => {
+    console.log(1);
+    res.render('auth/reset.ejs', {
+        path: '/Reset-Password',
+        pageTitle: 'Reset Password',
+        isAuthenticated: req.session.isLoggedIn,
+        invalidEmail: req.flash('error')
+    })
+}
+
+
+exports.postReset = (req, res, next) => {
+    crypto.randomBytes(32, (err, buffer) => {
+        if (err) {
+            console.log(err);
+            return res.redirect('/reset');
+        }
+
+        const token = buffer.toString('hex');
+        User.findOne({ gmail: req.body.gmail })
+            .then(user => {
+                if (!user) {
+                    req.flash('error', 'No account with that email');
+                    res.redirect('/reset');
+                } else {
+                    user.resetToken = token;
+                    user.resetTokenExpire = Date.now() + 3600000;
+                    return user.save();
+                }
+            })
+            .then(result => {
+
+
+                const mailOptions = { //sending mail creating mailoption
+                    from: 'badhonkhanbk007@gmail.com',
+                    to: req.body.gmail, //enters useer gmailid
+                    subject: 'Reset Password',
+                    html: `<h1>You Requested Password Reset</h1>
+                        <p><a href='http://localhost:3000/reset/${token}'>Click Here TO Reset</a> </p>  `
+                }
+
+                return transporter.sendMail(mailOptions, (err, data) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('message sent');
+                    }
+                })
+            })
+            .then(result => {
+                res.redirect('/');
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    })
+}
+
+
+exports.getNewPassword = (req, res, next) => {
+
+    const token = req.params.token;
+    User.findOne({ resetToken: token, resetTokenExpire: { $gt: Date.now() } })
+        .then(user => {
+            if (!user) {
+                req.flash('error', 'Your Session is over try again');
+                return res.redirect('/reset')
+            }
+            res.render('auth/new-password.ejs', {
+                path: '/Reset-Password',
+                pageTitle: 'Reset New Password',
+                isAuthenticated: req.session.isLoggedIn,
+                invalidEmail: req.flash('error'),
+                userId: user._id.toString(),
+                passwordToken: token
+            })
+        })
+        .catch(err => console.log(err));
+
+}
+
+
+exports.postNewPassword = (req, res, next) => {
+    const newPassword = req.body.password;
+    const userId = req.body.userId;
+    const passwordToken = req.body.passwordToken;
+
+    let resetUser;
+
+    User.findOne({ resetToken: passwordToken, resetTokenExpire: { $gt: Date.now() }, _id: userId })
+        .then(user => {
+            resetUser = user;
+            return bcrypt.hash(newPassword, 12);
+        })
+        .then(hashedPassword => {
+            resetUser.password = hashedPassword;
+            resetUser.resetToken = undefined;
+            resetUser.resetTokenExpire = undefined;
+
+            return resetUser.save();
+        })
+        .then(result => {
+            res.redirect('/login');
+        })
+        .catch(err => console.log(err))
 }
