@@ -31,12 +31,9 @@ const userSchema = new Schema({
     },
     resetToken: String,
     resetTokenExpire: Date,
-    token: {
-        type: String
-    },
-    active: {
-        type: Boolean
-    }
+    ActivationToken: String,
+    ActivationTokenExpire: Date,
+    active: Boolean
 })
 
 userSchema.methods.addToCart = function(product) {

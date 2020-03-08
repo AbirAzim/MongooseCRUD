@@ -4,13 +4,14 @@ const bcrypt = require('bcryptjs');
 const randomString = require('randomstring');
 const nodemailer = require('nodemailer');
 const nodemailerMailgunTransport = require('nodemailer-mailgun-transport');
+const { validationResult } = require('express-validator') //for server validation
 
 
 //step 1
 const auth = {
     auth: {
-        api_key: '889d8014d093da1cc7eb96beece1ef0f-c322068c-da37f278',
-        domain: 'sandboxd01d44a727b7430f978fb845b877f9a4.mailgun.org'
+        api_key: 'ba5b32cd6395f588b8ddad7f88e7edf8-c322068c-14658ddb',
+        domain: 'sandbox39618d0da832424da9b6d88d856fece9.mailgun.org'
     }
 }
 
@@ -82,56 +83,72 @@ exports.getSignup = (req, res, next) => {
         path: 'user/sign-up',
         pageTitle: 'Sign-up',
         isAuthenticated: false,
-        alreadyHaveThisEmailError: req.flash('errorAccount')
+        serverValidationError: [],
+        oldInput: { gmail: '', password: '', name: '' },
+        validationErrors: []
     })
 }
 
 
 exports.postSignup = (req, res, next) => {
+
     const gmail = req.body.gmail;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
     const name = req.body.name;
+    const errors = validationResult(req);
 
-    User.findOne({ gmail: gmail })
-        .then(user => {
-            if (user) {
-                req.flash('errorAccount', 'Already Have Account With That Email');
-                return res.redirect('/sign-up');
-            }
-            return bcrypt.hash(password, 12)
-                .then(hashPass => {
-                    const user = new User({
-                        name: name,
-                        gmail: gmail,
-                        password: hashPass,
-                        cart: { items: [] }
-                    })
-                    const mailOptions = { //sending mail creating mailoption
-                        from: 'badhonkhanbk007@gmail.com',
-                        to: gmail, //enters useer gmailid
-                        subject: 'new',
-                        html: `<h1>Successfully Registered to Diu Project Hub</h1>  <b>Thanks You !</b>`
-                    }
-                    let token = randomString.generate();
-                    user.token = token;
-                    //flag the account as inactive
-                    user.active = false;
-                    user.save()
-                        .then(result => {
-                            res.redirect('/login');
-                            transporter.sendMail(mailOptions, (err, data) => {
-                                if (err) {
-                                    console.log(err)
-                                } else {
-                                    console.log('message sent');
-                                }
-                            })
-                        })
-                        .catch(err => console.log(err));
+
+    if (!errors.isEmpty()) { // searching for invalid email
+
+        return res.status(422).render('auth/signup.ejs', {
+            path: 'user/sign-up',
+            pageTitle: 'Sign-up',
+            isAuthenticated: false,
+            serverValidationError: errors.array()[0].msg,
+            oldInput: { gmail: gmail, password: password, name: name },
+            validationErrors: errors.array()
+        });
+    }
+
+    bcrypt.hash(password, 12)
+        .then(hashPass => {
+            const user = new User({
+                    name: name,
+                    gmail: gmail,
+                    password: hashPass,
+                    cart: { items: [] }
                 })
+                // const mailOptions = { //sending mail creating mailoption
+                //     from: 'badhonkhanbk007@gmail.com',
+                //     to: gmail, //enters useer gmailid
+                //     subject: 'new',
+                //     html: `<h1>Successfully Registered to Diu Project Hub</h1>  <b>Thanks You !</b>`
+                // }
+                //flag the account as inactive
+            user.active = false;
+
+            res.render('auth/getConfirmation.ejs', {
+                    path: '/Get-Confirmation',
+                    pageTitle: 'Sending Confirmation Message',
+                    isAuthenticated: req.session.isLoggedIn,
+                    userInfo: user
+                })
+                // user.save()
+                //     .then(result => {
+                //         res.redirect('/login');
+                //         transporter.sendMail(mailOptions, (err, data) => {
+                //             if (err) {
+                //                 console.log(err)
+                //             } else {
+                //                 console.log('message sent');
+                //             }
+                //         })
+                //     })
+                //     .catch(err => console.log(err));
         })
-        .catch(err => console.log(err));
+
+
 }
 
 
@@ -240,4 +257,20 @@ exports.postNewPassword = (req, res, next) => {
             res.redirect('/login');
         })
         .catch(err => console.log(err))
+}
+
+
+exports.getConfirmation = (req, res, next) => {
+    res.render('auth/getConfirmation.ejs', {
+        path: '/Get-Confirmation',
+        pageTitle: 'Sending Confirmation Message',
+        isAuthenticated: req.session.isLoggedIn,
+        userInfo: {}
+    })
+}
+
+
+exports.postConfirmation = (req, res, next) => {
+    console.log(req.body.userInfo);
+    res.redirect('/');
 }
