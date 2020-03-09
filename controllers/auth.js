@@ -10,8 +10,8 @@ const { validationResult } = require('express-validator') //for server validatio
 //step 1
 const auth = {
     auth: {
-        api_key: 'd8676b3ca8f56805ccc05fe625614075-ee13fadb-c83f99f9',
-        domain: 'sandboxee94d29a176e4427a25afc2adb67c207.mailgun.org'
+        api_key: '2cea695128b5a176f042fa08133a20e8-ee13fadb-3e61d1e3',
+        domain: 'sandboxc942b4f5b1ec4fd3a5dc91d6a9e48bca.mailgun.org'
 
     }
 }
@@ -26,9 +26,11 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login.ejs', {
         path: 'user/login',
         pageTitle: 'Log-in',
-        isAuthenticated: false,
-        invalidEmail: req.flash('error'),
-        invalidPassword: req.flash('errorPass')
+        isAuthenticated: req.session.isLoggedIn,
+        error: '',
+        oldInput: { gmail: '', password: '' }
+        //invalidPassword: req.flash('errorPass')
+
     })
 }
 
@@ -38,11 +40,30 @@ exports.postLogin = (req, res, next) => {
     const gmail = req.body.gmail;
     const password = req.body.password;
 
+    const errors = validationResult(req);
+
+    // if (!errors.isEmpty()) { // check for error data input by user
+
+    //     return res.status(422).render('auth/login.ejs', {
+    //         path: 'user/log-in',
+    //         pageTitle: 'Log-in',
+    //         isAuthenticated: req.session.isLoggedIn,
+    //         error: 'Input a valid diu email !',
+    //         oldInput: { gmail: gmail, password: password},
+    //     });
+    // }
+
     User.findOne({ gmail: gmail })
         .then(user => {
             if (!user) {
-                req.flash('error', 'Invalid Email');
-                res.redirect('/login');
+                return res.status(422).render('auth/login.ejs', {
+                    path: 'user/log-in',
+                    pageTitle: 'Log-in',
+                    isAuthenticated: req.session.isLoggedIn,
+                    error: 'Input a valid diu email !',
+                    oldInput: { gmail: gmail, password: password },
+                });
+
             } else {
                 bcrypt.compare(password, user.password)
                     .then(doMatch => {
@@ -51,17 +72,27 @@ exports.postLogin = (req, res, next) => {
                             req.session.isLoggedIn = true; // this is added throughmiddlewire 
                             req.session.save(err => {
                                 if (err) {
-                                    res.redirect('/login');
+                                    return res.status(422).render('auth/login.ejs', {
+                                        path: 'user/log-in',
+                                        pageTitle: 'Log-in',
+                                        isAuthenticated: req.session.isLoggedIn,
+                                        error: 'Something Went Wrong !',
+                                        oldInput: { gmail: gmail, password: password },
+                                    });
                                 } else res.redirect('/');
                             });
                         } else {
-                            req.flash('errorPass', 'Invalid Password');
-                            res.redirect('/login');
+                            return res.status(422).render('auth/login.ejs', {
+                                path: 'user/log-in',
+                                pageTitle: 'Log-in',
+                                isAuthenticated: req.session.isLoggedIn,
+                                error: 'Incorrect Password !',
+                                oldInput: { gmail: gmail, password: password },
+                            });
                         }
                     })
                     .catch(err => {
-                        req.flash('errorPass', 'Invalid Password');
-                        res.redirect('/login');
+                        console.log(err);
                     });
             }
         })
@@ -99,7 +130,7 @@ exports.postSignup = (req, res, next) => {
     const errors = validationResult(req);
 
 
-    if (!errors.isEmpty()) { // searching for invalid email
+    if (!errors.isEmpty()) { // check for error data input by user
 
         return res.status(422).render('auth/signup.ejs', {
             path: 'user/sign-up',
@@ -114,38 +145,20 @@ exports.postSignup = (req, res, next) => {
     bcrypt.hash(password, 12)
         .then(hashPass => {
             const user = new User({
-                    name: name,
-                    gmail: gmail,
-                    password: hashPass,
-                    cart: { items: [] }
-                })
-                // const mailOptions = { //sending mail creating mailoption
-                //     from: 'badhonkhanbk007@gmail.com',
-                //     to: gmail, //enters useer gmailid
-                //     subject: 'new',
-                //     html: `<h1>Successfully Registered to Diu Project Hub</h1>  <b>Thanks You !</b>`
-                // }
-                //flag the account as inactive
+                name: name,
+                gmail: gmail,
+                password: hashPass,
+                cart: { items: [] }
+            })
+
             user.active = false;
 
             res.render('auth/getConfirmation.ejs', {
-                    path: '/Get-Confirmation',
-                    pageTitle: 'Sending Confirmation Message',
-                    isAuthenticated: req.session.isLoggedIn,
-                    userInfo: user
-                })
-                // user.save()
-                //     .then(result => {
-                //         res.redirect('/login');
-                //         transporter.sendMail(mailOptions, (err, data) => {
-                //             if (err) {
-                //                 console.log(err)
-                //             } else {
-                //                 console.log('message sent');
-                //             }
-                //         })
-                //     })
-                //     .catch(err => console.log(err));
+                path: '/Get-Confirmation',
+                pageTitle: 'Sending Confirmation Message',
+                isAuthenticated: req.session.isLoggedIn,
+                userInfo: user
+            })
         })
 
 
@@ -158,51 +171,57 @@ exports.getReset = (req, res, next) => {
         path: '/Reset-Password',
         pageTitle: 'Reset Password',
         isAuthenticated: req.session.isLoggedIn,
-        invalidEmail: req.flash('error')
+        error: '',
+        oldInput: ''
     })
 }
 
 
 exports.postReset = (req, res, next) => {
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.render('auth/reset.ejs', {
+            path: '/Reset-Password',
+            pageTitle: 'Reset Password',
+            isAuthenticated: req.session.isLoggedIn,
+            error: 'No Accounts With This Email',
+            oldInput: req.body.gmail
+        })
+    }
+
+
     crypto.randomBytes(32, (err, buffer) => {
+
         if (err) {
             console.log(err);
             return res.redirect('/reset');
         }
 
         const token = buffer.toString('hex');
+
         User.findOne({ gmail: req.body.gmail })
             .then(user => {
-                if (!user) {
-                    req.flash('error', 'No account with that email');
-                    res.redirect('/reset');
-                } else {
-                    user.resetToken = token;
-                    user.resetTokenExpire = Date.now() + 3600000;
-                    return user.save();
-                }
+                user.resetToken = token;
+                user.resetTokenExpire = Date.now() + 3600000;
+                return user.save()
             })
             .then(result => {
-
-
                 const mailOptions = { //sending mail creating mailoption
                     from: 'shaharaaktermunabk@gmail.com',
                     to: req.body.gmail, //enters useer gmailid
                     subject: 'Reset Password',
                     html: `<h1>You Requested Password Reset</h1>
-                        <p><a href='http://localhost:3000/reset/${token}'>Click Here TO Reset</a> </p>  `
+                    <p><a href='http://localhost:3000/reset/${token}'>Click Here TO Reset</a> </p>  `
                 }
-
-                return transporter.sendMail(mailOptions, (err, data) => {
+                transporter.sendMail(mailOptions, (err, data) => {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log('message sent');
+                        res.redirect('/messageSent');
                     }
                 })
-            })
-            .then(result => {
-                res.redirect('/');
             })
             .catch(err => {
                 console.log(err);
@@ -217,14 +236,13 @@ exports.getNewPassword = (req, res, next) => {
     User.findOne({ resetToken: token, resetTokenExpire: { $gt: Date.now() } })
         .then(user => {
             if (!user) {
-                req.flash('error', 'Your Session is over try again');
                 return res.redirect('/reset')
             }
             res.render('auth/new-password.ejs', {
                 path: '/Reset-Password',
                 pageTitle: 'Reset New Password',
                 isAuthenticated: req.session.isLoggedIn,
-                invalidEmail: req.flash('error'),
+                errors: [],
                 userId: user._id.toString(),
                 passwordToken: token
             })
@@ -235,7 +253,27 @@ exports.getNewPassword = (req, res, next) => {
 
 
 exports.postNewPassword = (req, res, next) => {
+
+    const errors = validationResult(req);
+    console.log(errors);
+
+    if (!errors.isEmpty()) { // check for error data input by user
+
+        return res.status(422).render('auth/new-password.ejs', {
+            path: 'user/sign-up',
+            pageTitle: 'Sign-up',
+            isAuthenticated: req.session.isLoggedIn,
+            userId: req.body.userId,
+            passwordToken: req.body.passwordToken,
+            errors: errors.array(),
+            _csrf: req.body._csrf
+        });
+    }
+
+
+
     const newPassword = req.body.password;
+
     const userId = req.body.userId;
     const passwordToken = req.body.passwordToken;
 
