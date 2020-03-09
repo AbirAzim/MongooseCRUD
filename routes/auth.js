@@ -53,4 +53,8 @@ router.get('/confirmation', authController.getConfirmation);
 
 router.post('/confirmation', authController.postConfirmation);
 
+router.get('/messageSent', authController.getMessageSent);
+
+router.post('/confirmation/:token', authController.postConfirmationWithToken);
+
 module.exports = router;

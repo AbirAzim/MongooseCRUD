@@ -32,7 +32,6 @@ const userSchema = new Schema({
     resetToken: String,
     resetTokenExpire: Date,
     ActivationToken: String,
-    ActivationTokenExpire: Date,
     active: Boolean
 })
 

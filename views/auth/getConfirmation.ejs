@@ -10,7 +10,11 @@
                         <div class="col-sm-2">
                             <form action="/confirmation" method="POST" class="my-3">
                                 <div class="form-group">
-                                    <input type="hidden" class="form-control" id="gmail" placeholder="Enter Gmail" name="userInfo" value="<%= userInfo %>">
+                                    <input type="hidden" name="name" value="<%= userInfo.name %>">
+                                    <input type="hidden" name="gmail" value="<%= userInfo.gmail %>">
+                                    <input type="hidden" name="password" value="<%= userInfo.password %>">
+                                    <input type="hidden" name="active" value="<%= userInfo.active %>">
+                                    <input type="hidden" name="userInfo" value="<%= JSON.stringify(userInfo) %>">
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 </div>
                                 <div class="form-group">

@@ -10,8 +10,9 @@ const { validationResult } = require('express-validator') //for server validatio
 //step 1
 const auth = {
     auth: {
-        api_key: 'ba5b32cd6395f588b8ddad7f88e7edf8-c322068c-14658ddb',
-        domain: 'sandbox39618d0da832424da9b6d88d856fece9.mailgun.org'
+        api_key: 'd8676b3ca8f56805ccc05fe625614075-ee13fadb-c83f99f9',
+        domain: 'sandboxee94d29a176e4427a25afc2adb67c207.mailgun.org'
+
     }
 }
 
@@ -94,7 +95,6 @@ exports.postSignup = (req, res, next) => {
 
     const gmail = req.body.gmail;
     const password = req.body.password;
-    const confirmPassword = req.body.confirmPassword;
     const name = req.body.name;
     const errors = validationResult(req);
 
@@ -186,7 +186,7 @@ exports.postReset = (req, res, next) => {
 
 
                 const mailOptions = { //sending mail creating mailoption
-                    from: 'badhonkhanbk007@gmail.com',
+                    from: 'shaharaaktermunabk@gmail.com',
                     to: req.body.gmail, //enters useer gmailid
                     subject: 'Reset Password',
                     html: `<h1>You Requested Password Reset</h1>
@@ -271,6 +271,94 @@ exports.getConfirmation = (req, res, next) => {
 
 
 exports.postConfirmation = (req, res, next) => {
-    console.log(req.body.userInfo);
-    res.redirect('/');
+
+    const userInfo = JSON.parse(req.body.userInfo);
+
+    crypto.randomBytes(32, (err, buffer) => {
+        if (err) {
+            console.log(err);
+            return res.redirect('/');
+        }
+
+        const token = buffer.toString('hex');
+        userInfo.ActivationToken = token;
+
+        console.log(userInfo);
+
+        const mailOptions = { //sending mail creating mailoption http://localhost:3000/confirmation/${token}
+            from: 'shaharaaktermunabk@gmail.com',
+            to: userInfo.gmail, //enters useer gmailid
+            subject: 'Activate Your Account',
+            html: `<h1>You Hvae Requested For Activation</h1>
+            <br>
+            <form action="http://localhost:3000/confirmation/${userInfo.ActivationToken}" method="POST" class="my-3">
+            <div class="">
+                <input type="hidden"  name="userInfo" value='${JSON.stringify(userInfo)}'>
+                <input type="hidden" name="_csrf" value='${req.body._csrf}'>
+            </div>                      
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+        </form>`
+        }
+
+
+
+        transporter.sendMail(mailOptions, (err, data) => {
+            if (err) {
+                console.log(err);
+                res.redirect('/');
+            } else {
+                console.log('message sent');
+                res.redirect('/messageSent');
+            }
+        })
+    })
+
+}
+
+
+exports.postConfirmationWithToken = (req, res, next) => {
+
+    const userInfo = JSON.parse(req.body.userInfo);
+    const token = req.params.token;
+
+    if (token === userInfo.ActivationToken) {
+        User.findOne({ gmail: userInfo.gmail })
+            .then(user => {
+                if (user) {
+                    res.redirect('/');
+                } else {
+                    const user = new User({
+                        name: userInfo.name,
+                        gmail: userInfo.gmail,
+                        password: userInfo.password,
+                        cart: { items: [] },
+                        active: userInfo.active
+                    })
+
+                    user.save()
+                        .then(result => {
+                            return res.render('auth/login.ejs', {
+                                path: 'user/login',
+                                pageTitle: 'Log-in',
+                                isAuthenticated: false,
+                                invalidEmail: [],
+                                invalidPassword: []
+                            })
+                        })
+                        .catch(err => console.log(err));
+
+                }
+            })
+    }
+}
+
+
+exports.getMessageSent = (req, res, next) => {
+    res.render('auth/messegeSent.ejs', {
+        path: '/message-sent',
+        pageTitle: 'Message Sent',
+        isAuthenticated: req.session.isLoggedIn,
+    })
 }
