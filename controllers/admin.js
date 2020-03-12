@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const mongoose = require('mongoose');
 
 
 exports.getAddProduct = (req, res, next) => {
@@ -17,9 +18,16 @@ exports.postAddProduct = (req, res, next) => {
 
     const productName = req.body.productName;
     const productPrice = req.body.productPrice;
-    const imageUrl = req.body.imageUrl;
+    const image = req.file;
     const desc = req.body.description;
     const userId = req.user._id;
+
+    // if(!image){
+    //     err
+    // }
+
+
+    const imageUrl = image.path;
 
     const product = new Product({
         productName: productName,
@@ -28,6 +36,7 @@ exports.postAddProduct = (req, res, next) => {
         imageUrl: imageUrl,
         userId: userId
     });
+
 
     product.save() //save method comming from mongoose
         .then(result => {
@@ -42,7 +51,11 @@ exports.postAddProduct = (req, res, next) => {
                 })
                 .catch(err => console.log(err));
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 }
 
 exports.getProductList = (req, res, next) => { //{ userId: req.user._id }
@@ -57,7 +70,9 @@ exports.getProductList = (req, res, next) => { //{ userId: req.user._id }
                 path: 'admin/product-list.ejs',
                 isAuthenticated: req.session.isLoggedIn
             })
-        }).catch(err => console.log(err));
+        }).catch(err => {
+            res.redirect('/500');
+        });
 }
 
 exports.getEditProduct = (req, res, next) => {
@@ -71,7 +86,9 @@ exports.getEditProduct = (req, res, next) => {
                 isAuthenticated: req.session.isLoggedIn
             });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            res.redirect('/500')
+        });
 }
 
 
@@ -80,7 +97,7 @@ exports.postEditData = (req, res, next) => {
 
     const updatedProductName = req.body.productName;
     const updatedProductPrice = req.body.productPrice;
-    const updatedImageUrl = req.body.imageUrl;
+    const updatedImage = req.file;
     const updatedDesc = req.body.description;
     const prodId = req.body.productId;
     const userId = req.user._id;
@@ -94,7 +111,9 @@ exports.postEditData = (req, res, next) => {
             }
             product.productName = updatedProductName;
             product.productPrice = updatedProductPrice;
-            product.imageUrl = updatedImageUrl;
+            if (updatedImage) { //check whether user inputed the correct format or not;
+                product.imageUrl = updatedImage.path;
+            }
             product.description = updatedDesc;
             product.userId = userId;
 
@@ -111,9 +130,13 @@ exports.postEditData = (req, res, next) => {
                         isAuthenticated: req.session.isLoggedIn
                     })
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    res.redirect('/500')
+                });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            res.redirect('/500')
+        });
 
 }
 
@@ -133,7 +156,11 @@ exports.deleteData = (req, res, next) => {
                         isAuthenticated: req.session.isLoggedIn
                     })
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    res.redirect('/500')
+                });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            res.redirect('/500')
+        });
 }
