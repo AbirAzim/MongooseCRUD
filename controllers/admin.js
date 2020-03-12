@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const mongoose = require('mongoose');
+const fileHelper = require('../util/file');
 
 
 exports.getAddProduct = (req, res, next) => {
@@ -112,6 +113,7 @@ exports.postEditData = (req, res, next) => {
             product.productName = updatedProductName;
             product.productPrice = updatedProductPrice;
             if (updatedImage) { //check whether user inputed the correct format or not;
+                fileHelper.deleteFile(product.imageUrl);
                 product.imageUrl = updatedImage.path;
             }
             product.description = updatedDesc;
@@ -144,8 +146,15 @@ exports.postEditData = (req, res, next) => {
 exports.deleteData = (req, res, next) => {
 
     prodId = req.params.productId;
-    //Product.findByIdAndRemove(req.params.productId)
-    Product.deleteOne({ _id: prodId, userId: req.user._id })
+
+    Product.findById(prodId)
+        .then(product => {
+            if (!product) {
+                return next(new Error('product Not Found'));
+            }
+            fileHelper.deleteFile(product.imageUrl); // deleto=ing the local file 
+            return Product.deleteOne({ _id: prodId, userId: req.user._id })
+        })
         .then(() => {
             Product.find({ userId: req.user._id })
                 .then(products => {
@@ -157,10 +166,10 @@ exports.deleteData = (req, res, next) => {
                     })
                 })
                 .catch(err => {
-                    res.redirect('/500')
+                    return next(err);
                 });
         })
         .catch(err => {
-            res.redirect('/500')
+            return next(err);
         });
 }

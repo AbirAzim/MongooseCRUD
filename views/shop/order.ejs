@@ -1,40 +1,51 @@
 <%- include('../includes/head.ejs') %>
 
-<body>
-    <%- include('../includes/nav.ejs') %>
-    <div class="container">
-        <% if(orders.length <=0 ) {%>
-        <div class="row">
-            <div class="col">
+    <body>
+        <%- include('../includes/nav.ejs') %>
+            <div class="container">
+                <% if(orders.length <=0 ) {%>
+                    <div class="row">
+                        <div class="col">
 
+                        </div>
+
+                        <div class="col">
+                            <h1>Order Page</h1>
+                        </div>
+
+                        <div class="col">
+
+                        </div>
+                    </div>
+                    <% } else {  %>
+                        <ul>
+                            <%  orders.forEach( order => { %>
+                                <li>
+                                    <h1>
+                                        <%= order._id %>
+                                    </h1>
+                                    <h1>
+                                        <%= order.user.name%>
+                                    </h1>
+                                    <ul>
+                                        <% order.products.forEach(item => { %>
+                                            <li>
+                                                <%= item.product.productName %> (
+                                                    <%= item.quantity %>)</li>
+                                            <li>quantity :
+                                                <%= item.product.productPrice %>
+                                            </li>
+                                            <li>Description :
+                                                <%= item.product.description %>
+                                            </li>
+                                            <% })%>
+                                                <li><a href="/orders/<%= order._id %>">Invoice</a></li>
+                                    </ul>
+                                </li>
+                                <% })%>
+                        </ul>
+
+                        <% }%>
             </div>
 
-            <div class="col">
-                <h1>Order Page</h1>
-            </div>
-
-            <div class="col">
-
-            </div>
-        </div>
-        <% } else {  %>
-        <ul>
-            <%  orders.forEach( order => { %>
-            <li>
-                <h1><%= order._id %></h1>
-                <h1><%= order.user.name%></h1>
-                <ul>
-                    <% order.products.forEach(item => { %>
-                    <li><%= item.product.productName %> (<%= item.quantity %>)</li>
-                    <li>quantity : <%= item.product.productPrice %></li>
-                    <li>Description : <%= item.product.description %></li>
-                    <% })%>
-                </ul>
-            </li>
-            <% })%>
-        </ul>
-
-        <% }%>
-    </div>
-
-    <%- include('../includes/end.ejs') %>
+            <%- include('../includes/end.ejs') %>

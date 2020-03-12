@@ -20,4 +20,6 @@ router.get('/order', authenticate, shopHandeller.getOrder);
 
 router.post('/create-order', authenticate, shopHandeller.postOrder);
 
+router.get('/orders/:orderId', authenticate, shopHandeller.getInvoice);
+
 module.exports = router;
