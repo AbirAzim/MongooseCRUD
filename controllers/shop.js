@@ -16,17 +16,32 @@ exports.getHomePage = (req, res, next) => {
     });
 }
 
+const ITEM_PER_PAGE = 1;
 
 
 exports.getProductsPage = (req, res, next) => {
-
-    Product.find() // mongoose method
+    const page = parseInt(req.query.page) || 1;
+    let totalItems;
+    Product.find()
+        .countDocuments()
+        .then(numberOfProducts => {
+            totalItems = numberOfProducts;
+            return Product.find() // mongoose method
+                .skip((page - 1) * ITEM_PER_PAGE)
+                .limit(ITEM_PER_PAGE)
+        })
         .then(products =>
             res.render('shop/product-list', {
                 datas: products,
                 pageTitle: 'Product-List',
                 path: 'users/products',
-                isAuthenticated: req.session.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn,
+                currentPage: page,
+                hasNextPage: (ITEM_PER_PAGE * page) < totalItems,
+                hasPreviousPage: page > 1,
+                nextPage: page + 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(totalItems / ITEM_PER_PAGE)
             })
         )
         .catch(err => console.log(err));

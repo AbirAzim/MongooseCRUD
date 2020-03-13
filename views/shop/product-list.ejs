@@ -46,4 +46,40 @@
                                         <% }} %>
                                 </div>
                         </div>
+                        <div class="container">
+                            <% if(datas.length > 0){ %>
+                                <div class="row mt-5">
+                                    <% if(currentPage != 1 && previousPage != 1) { %>
+                                        <div class="col-sm"><a href="/users/products/?page=1" class="btn btn-secondary">1</a></div>
+                                        <%} %>
+                                            <% if(hasPreviousPage){ %>
+                                                <div class="col">
+                                                    <a href="/users/products/?page=<%= previousPage %>" class="btn btn-secondary">
+                                                        <%= previousPage %>
+                                                    </a>
+                                                </div>
+                                                <% } %>
+                                                    <div class="col">
+                                                        <a href="/users/products/?page=<%= currentPage %>" class="btn btn-secondary">
+                                                            <%= currentPage %>
+                                                        </a>
+                                                    </div>
+                                                    <% if(hasNextPage){ %>
+                                                        <div class="col">
+                                                            <a href="/users/products/?page=<%= nextPage %>" class="btn btn-secondary">
+                                                                <%= nextPage %>
+                                                            </a>
+                                                        </div>
+                                                        <% } %>
+                                                            <% if(lastPage !== currentPage && nextPage !== lastPage) {%>
+                                                                <div class="col-sm-2">
+                                                                    <a href="/users/products/?page=<%= lastPage %>" class="btn btn-secondary">
+                                                                        <%= lastPage %>
+                                                                    </a>
+                                                                </div>
+                                                                <% } %>
+                                </div>
+                                <% } %>
+                        </div>
+
                         <%- include('../includes/end.ejs') %>
