@@ -11,6 +11,8 @@ const MogodbSessionStore = require('connect-mongodb-session')(session);
 const csrfToken = require('csurf');
 const flash = require('connect-flash'); // for invalid something to show to the user
 const multer = require('multer');
+const shopHandeller = require('./controllers/shop');
+const authenticate = require('./middleware/is-auth');
 
 
 const User = require('./models/user');
@@ -71,7 +73,7 @@ app.use(session({
     store: store
 }));
 
-app.use(csrfProtection);
+
 
 app.use(flash());
 
@@ -95,6 +97,15 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
+    // res.locals.csrfToken = req.csrfToken(); // only available in views 
+    next(); // without next the program will stack here 
+})
+
+app.post('/create-order', authenticate, shopHandeller.postOrder);
+
+app.use(csrfProtection);
+app.use((req, res, next) => {
+    // res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken(); // only available in views 
     next(); // without next the program will stack here 
 })
@@ -108,6 +119,7 @@ app.get('/500', errorPage.error500);
 app.use(errorPage.errorController)
 
 app.use((err, req, res, next) => {
+    console.log(err);
     res.redirect('/500');
 })
 

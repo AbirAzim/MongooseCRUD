@@ -33,6 +33,7 @@
     "pdfkit": "^0.11.0",
     "pug": "^2.0.4",
     "randomstring": "^1.1.5",
-    "sequelize": "^5.21.5"
+    "sequelize": "^5.21.5",
+    "stripe": "^8.31.0"
   }
 }

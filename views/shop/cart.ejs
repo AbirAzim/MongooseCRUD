@@ -37,10 +37,7 @@
                                 <% }) %>
                         </div>
                         <% if(productItem.length > 0) { %>
-                            <form action="/create-order" method="POST" class="mt-2 text-center">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <button class="btn btn-secondary" type="submit">Order Now !</button>
-                            </form>
+                            <a href="/checkout" class="btn btn-secondary mt-2 text-center" type="submit">Order Now !</a>
                             <% } %>
                     </div>
 

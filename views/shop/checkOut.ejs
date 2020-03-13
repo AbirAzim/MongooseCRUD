@@ -1,0 +1,41 @@
+<%- include('../includes/head.ejs') %>
+
+    <body>
+        <%- include('../includes/nav.ejs') %>
+            <main>
+                <div class="container">
+                    <div class="row">
+                        <% productItem.forEach(item => { %>
+                            <div class="col-sm-4">
+                                <div class="card text-center mt-4" style="width: 22rem;">
+                                    <img class="card-img-top" src="/<%= item.productId.imageUrl %>" alt="Card image cap">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Name : <span class="text-primary"><%= item.productId.productName %></span>
+                                        </h5>
+                                        <h5 class="card-title text-dander">Price : <span class="text-danger"><%= item.productId.productPrice %></span></h5>
+                                        <h5 class="card-title text-secondary">Quantity : <span class="text-secondary"><%= item.quantity %></span></h5>
+                                        <p class="card-text">
+                                            <%= item.productId.description %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h2>Total :
+                        <%= totalSum %>
+                    </h2>
+                </div>
+                <div class="text-center">
+                    <form action="/create-order" method="POST">
+                        <input type="hidden">
+                        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="pk_test_QtnmCtSVTSP2yzF3jAPfHrys007LwTIHoo" data-amount="<%= totalSum * 100 %>" data-name="Your Order" data-description="All the items you ordewred" data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                            data-locale="auto" data-currency="usd">
+                        </script>
+                    </form>
+                </div>
+            </main>
+
+            <%- include('../includes/end.ejs') %>

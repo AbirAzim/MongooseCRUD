@@ -23,25 +23,25 @@ exports.getProductsPage = (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     let totalItems;
     Product.find()
-        .countDocuments()
-        .then(numberOfProducts => {
-            totalItems = numberOfProducts;
-            return Product.find() // mongoose method
-                .skip((page - 1) * ITEM_PER_PAGE)
-                .limit(ITEM_PER_PAGE)
-        })
+        // .countDocuments()
+        // .then(numberOfProducts => {
+        //     totalItems = numberOfProducts;
+        //     return Product.find() // mongoose method
+        //         .skip((page - 1) * ITEM_PER_PAGE)
+        //         .limit(ITEM_PER_PAGE)
+        // })
         .then(products =>
             res.render('shop/product-list', {
                 datas: products,
                 pageTitle: 'Product-List',
                 path: 'users/products',
                 isAuthenticated: req.session.isLoggedIn,
-                currentPage: page,
-                hasNextPage: (ITEM_PER_PAGE * page) < totalItems,
-                hasPreviousPage: page > 1,
-                nextPage: page + 1,
-                previousPage: page - 1,
-                lastPage: Math.ceil(totalItems / ITEM_PER_PAGE)
+                // currentPage: page,
+                // hasNextPage: (ITEM_PER_PAGE * page) < totalItems,
+                // hasPreviousPage: page > 1,
+                // nextPage: page + 1,
+                // previousPage: page - 1,
+                // lastPage: Math.ceil(totalItems / ITEM_PER_PAGE)
             })
         )
         .catch(err => console.log(err));
@@ -102,13 +102,47 @@ exports.deleteFromCart = (req, res, next) => {
 
 }
 
-exports.postOrder = (req, res, next) => {
+exports.getCheckout = (req, res, next) => {
 
     req.user
         .populate('cart.items.productId')
         .execPopulate()
         .then(user => {
-            console.log(user.cart.items.productId);
+            products = user.cart.items;
+            let total = 0;
+
+            products.forEach(p => {
+                total += p.quantity * p.productId.productPrice;
+            })
+
+            res.render('shop/checkOut', {
+                pageTitle: 'Checkout',
+                path: 'users/checkout',
+                isAuthenticated: req.session.isLoggedIn,
+                productItem: products,
+                totalSum: total
+            })
+        })
+        .catch(err => {
+            return next(err);
+        })
+
+}
+
+exports.postOrder = (req, res, next) => {
+    const stripe = require('stripe')('sk_test_kXXj8keqTfSiq3Ql1wS3QSn3003qA6Pr9n')
+    const token = req.body.stripeToken;
+    let totalSum = 0;
+
+
+    req.user
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user => {
+            user.cart.items.forEach((p) => {
+                totalSum += p.quantity * p.productId.productPrice;
+            })
+
             const productData = user.cart.items.map(i => {
                 return {
                     quantity: i.quantity,
@@ -127,7 +161,14 @@ exports.postOrder = (req, res, next) => {
 
             return order.save();
         })
-        .then(() => {
+        .then((result) => {
+            const charge = stripe.charges.create({
+                amount: totalSum * 100,
+                currency: 'usd',
+                description: 'Example charge',
+                source: token,
+                metadata: { oderId: result._id.toString() }
+            })
 
             return req.user.clearCart();
         })

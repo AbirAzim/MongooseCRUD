@@ -158,18 +158,13 @@ exports.deleteData = (req, res, next) => {
         .then(() => {
             Product.find({ userId: req.user._id })
                 .then(products => {
-                    res.render('admin/products.ejs', {
-                        datas: products,
-                        pageTitle: 'Product-List',
-                        path: 'admin/product-list.ejs',
-                        isAuthenticated: req.session.isLoggedIn
-                    })
+                    res.status(200).json({ message: 'success !' });
                 })
                 .catch(err => {
-                    return next(err);
+                    res.status(500).json({ message: `${err}` });
                 });
         })
         .catch(err => {
-            return next(err);
+            res.status(500).json({ message: `${err}` });
         });
 }
